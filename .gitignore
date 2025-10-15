@@ -1,2 +1,6 @@
 data/*.json
 .vscode
+osmosis*
+data/postgis
+*.pbf
+docker-compose.yaml

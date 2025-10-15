@@ -5,8 +5,8 @@ import pandas as pd
 import json
 
 # Download latest version to 'data' dir
-kaggle.api.authenticate()
-kaggle.api.dataset_download_files("yelp-dataset/yelp-dataset", path=os.getcwd(), unzip=True)
+# kaggle.api.authenticate()
+# kaggle.api.dataset_download_files("yelp-dataset/yelp-dataset", path=os.getcwd(), unzip=True)
 
 def get_place_data(latitude_decimal, longitude_decimal, radius_meters):
     API_KEY = os.getenv('GOOGLE_API_KEY')
