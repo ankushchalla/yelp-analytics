@@ -14,6 +14,7 @@ class YelpJsonFields(Enum):
     LATITUDE = 'latitude'
     LONGITUDE = 'longitude'
     ATTRIBUTES = 'attributes'
+    CATEGORIES = 'categories'
 
 class Point(NamedTuple):
     latitude: float
@@ -58,9 +59,18 @@ def to_attribute_list(json) -> list[Attribute] | None:
     
     return [Attribute(json[YelpJsonFields.BUSINESS_ID.value], attr_name, attr_value) for (attr_name, attr_value) in attrs]
 
-class BusinessCategory(NamedTuple):
+class Category(NamedTuple):
     business_id: str
-    category_name: str
+    name: str
+
+def to_category_list(json) -> list[Category] | None:
+    if json.get(YelpJsonFields.CATEGORIES.value) is None:
+        return None
+    categories = json.get(YelpJsonFields.CATEGORIES.value).split(',')
+    if (len(categories) == 0):
+        return None
+    
+    return [Category(json[YelpJsonFields.BUSINESS_ID.value], category.lstrip()) for category in categories]
 
 class Date(NamedTuple):
     year: int
@@ -71,5 +81,6 @@ class Date(NamedTuple):
 class BusinessRecord:
     address: Address
     attributes: list[Attribute] | None
+    categories: list[Category] | None
 
         

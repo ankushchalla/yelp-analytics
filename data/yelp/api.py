@@ -1,5 +1,6 @@
 from typing import Iterable, List
 from collections.abc import Generator
+from ..types import BusinessRecord, to_address, to_attribute_list, to_category_list
 import kaggle
 import os
 import pandas as pd
@@ -7,8 +8,6 @@ import json
 import logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("data.yelp.api")
-
-from ..types import BusinessRecord, to_address, to_attribute_list
 
 # Download latest version to working directory
 # kaggle.api.authenticate()
@@ -39,12 +38,6 @@ class YelpService():
                 break
 
             json_line = json.loads(line.strip())
-            yield BusinessRecord(to_address(json_line), to_attribute_list(json_line))
+            yield BusinessRecord(to_address(json_line), to_attribute_list(json_line), to_category_list(json_line))
 
-    def test(self, num_records):
-        self.download_yelp_data()
-        file_path = os.path.join(os.getcwd(), 'data', 'yelp', 'yelp_academic_dataset_business.json')
-        df = pd.DataFrame()
-        with open(file_path, 'r', encoding='utf-8') as file:            
-            first_n_rows = [next(self.read_business_dataset(file)) for i in range(num_records)]
             
