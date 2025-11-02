@@ -4,3 +4,5 @@ osmosis*
 data/postgis
 *.pbf
 docker-compose.yaml
+**cache**
+*.json
