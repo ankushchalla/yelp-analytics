@@ -1,6 +1,7 @@
 from typing import NamedTuple
 from enum import Enum
 from dataclasses import dataclass
+from datetime import date, datetime
 import shapely.geometry
 import shapely.wkt
 
@@ -15,10 +16,11 @@ class YelpJsonFields(Enum):
     LONGITUDE = 'longitude'
     ATTRIBUTES = 'attributes'
     CATEGORIES = 'categories'
-
-class Point(NamedTuple):
-    latitude: float
-    longitude: float
+    REVIEW_ID = 'review_id'
+    STARS = 'stars'
+    USEFUL = 'useful'
+    TEXT = 'text'
+    DATE = 'date'
 
 class Address(NamedTuple):
     business_id: str
@@ -73,14 +75,46 @@ def to_category_list(json) -> list[Category] | None:
     return [Category(json[YelpJsonFields.BUSINESS_ID.value], category.lstrip()) for category in categories]
 
 class Date(NamedTuple):
+    date_id: int
     year: int
     month: int
     day: int
+
+def to_date(review_date_str: str) -> Date:
+    datetime_format = '%y-%m-%d %H:%M:%S'
+    date_format = '%y-%m-%d'
+    review_date = datetime.strptime(review_date_str, datetime_format)
+    date_id = int(review_date.strftime(date_format))
+    return Date(
+        date_id=date_id, 
+        year=review_date.year,
+        month=review_date.month,
+        day=review_date.day
+    )
+
+@dataclass(frozen=True)
+class Review(NamedTuple):
+    review_id: str
+    business_id: str
+    stars: float
+    useful: int
+    text: str
+    date: Date
+
+def to_review(json, date_id: int) -> Review:
+    review_date_str = json[YelpJsonFields.DATE.value]
+    return Review(
+        review_id=json[YelpJsonFields.REVIEW_ID.value],
+        business_id=json[YelpJsonFields.BUSINESS_ID.value],
+        stars=json[YelpJsonFields.STARS.value],
+        useful=json[YelpJsonFields.USEFUL.value],
+        text=json[YelpJsonFields.TEXT.value],
+        date=to_date(review_date_str)
+    )
 
 @dataclass(frozen=True)
 class BusinessRecord:
     address: Address
     attributes: list[Attribute] | None
     categories: list[Category] | None
-
         

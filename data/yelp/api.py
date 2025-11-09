@@ -1,9 +1,7 @@
-from typing import Iterable, List
 from collections.abc import Generator
-from ..types import BusinessRecord, to_address, to_attribute_list, to_category_list
+from ..types import BusinessRecord, to_address, to_attribute_list, to_category_list, to_review
 import kaggle
 import os
-import pandas as pd
 import json
 import logging
 logging.basicConfig(level=logging.INFO)
@@ -38,6 +36,10 @@ class YelpService():
                 break
 
             json_line = json.loads(line.strip())
-            yield BusinessRecord(to_address(json_line), to_attribute_list(json_line), to_category_list(json_line))
+            yield BusinessRecord(
+                to_address(json_line), 
+                to_attribute_list(json_line), 
+                to_category_list(json_line)
+            )
 
             
