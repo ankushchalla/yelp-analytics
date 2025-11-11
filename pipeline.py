@@ -7,18 +7,16 @@ class Pipeline:
     def __init__(self) -> None:
         self.yelp_service = YelpService()
         self.big_query_client = BigQueryClient()
-        self.yelp_download_path = file_path = os.path.join(os.getcwd(), 'data', 'yelp', 'yelp_academic_dataset_business.json')
 
     def extract(self):
         self.yelp_service.download_yelp_data()
 
     def load_slice(self, num):
-        with open(self.yelp_download_path, 'r', encoding='utf-8') as file:   
-            yelp_dataset_gen = self.yelp_service.read_business_dataset(file)         
-            first_n_rows = list(islice(yelp_dataset_gen, num))
-            self.big_query_client.load_business_records(first_n_rows)
-            if self.big_query_client.errors != []:
-                print(self.big_query_client.errors)
+        yelp_dataset_gen = self.yelp_service.read_review_dateset()     
+        first_n_rows = list(islice(yelp_dataset_gen, num))
+        self.big_query_client.load_review_records(first_n_rows)
+        if self.big_query_client.errors != []:
+            print(self.big_query_client.errors)
 
 pipeline = Pipeline()
 pipeline.extract()

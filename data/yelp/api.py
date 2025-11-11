@@ -1,5 +1,5 @@
 from collections.abc import Generator
-from ..types import BusinessRecord, to_address, to_attribute_list, to_category_list, to_review
+from ..types import BusinessRecord, ReviewRecord, to_address, to_attribute_list, to_category_list, to_review_record
 import kaggle
 import os
 import json
@@ -14,8 +14,8 @@ logger = logging.getLogger("data.yelp.api")
 class YelpService():
     def __init__(self) -> None:
         data_dir = os.path.join(os.getcwd(), 'data', 'yelp')
-        self.reviews_file_path = os.path.join(data_dir, 'yelp_academic_dataset_review.json')
         self.businesses_file_path = os.path.join(data_dir, 'yelp_academic_dataset_business.json')
+        self.reviews_file_path = os.path.join(data_dir, 'yelp_academic_dataset_review.json')
 
     def download_yelp_data(self):
         if not (os.path.exists(self.reviews_file_path) and os.path.exists(self.businesses_file_path)):
@@ -27,19 +27,33 @@ class YelpService():
             logger.info("YELP_DATA_DOWNLOAD_SKIP")
 
 
-    def read_business_dataset(self, file_object) -> Generator[BusinessRecord, None, None]:
-        while True:
-            line = file_object.readline()
+    def read_business_dataset(self) -> Generator[BusinessRecord, None, None]:
+        with open(self.businesses_file_path, 'r', encoding='utf-8') as file:
+            while True:
+                line = file.readline()
 
-            # break if EOF reached
-            if not line:
-                break
+                # break if EOF reached
+                if not line:
+                    break
 
-            json_line = json.loads(line.strip())
-            yield BusinessRecord(
-                to_address(json_line), 
-                to_attribute_list(json_line), 
-                to_category_list(json_line)
-            )
+                json_line = json.loads(line.strip())
+                yield BusinessRecord(
+                    to_address(json_line), 
+                    to_attribute_list(json_line), 
+                    to_category_list(json_line)
+                )
+
+    def read_review_dateset(self) -> Generator[ReviewRecord, None, None]:
+        with open(self.reviews_file_path, 'r', encoding='utf-8') as file:
+            while True:
+                line = file.readline()
+
+                # break if EOF reached
+                if not line:
+                    break
+
+                json_line = json.loads(line.strip())
+                yield to_review_record(json_line)
+
 
             

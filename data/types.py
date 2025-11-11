@@ -81,10 +81,10 @@ class Date(NamedTuple):
     day: int
 
 def to_date(review_date_str: str) -> Date:
-    datetime_format = '%y-%m-%d %H:%M:%S'
-    date_format = '%y-%m-%d'
+    datetime_format = '%Y-%m-%d %H:%M:%S'
+    date_id_format = '%Y%m%d'
     review_date = datetime.strptime(review_date_str, datetime_format)
-    date_id = int(review_date.strftime(date_format))
+    date_id = int(review_date.strftime(date_id_format))
     return Date(
         date_id=date_id, 
         year=review_date.year,
@@ -92,29 +92,36 @@ def to_date(review_date_str: str) -> Date:
         day=review_date.day
     )
 
-@dataclass(frozen=True)
 class Review(NamedTuple):
     review_id: str
     business_id: str
     stars: float
     useful: int
     text: str
+    date_id: int
+
+@dataclass(frozen=True)
+class ReviewRecord:
+    review: Review
     date: Date
 
-def to_review(json, date_id: int) -> Review:
+def to_review_record(json) -> ReviewRecord:
     review_date_str = json[YelpJsonFields.DATE.value]
-    return Review(
+    date = to_date(review_date_str)
+    review = Review(
         review_id=json[YelpJsonFields.REVIEW_ID.value],
         business_id=json[YelpJsonFields.BUSINESS_ID.value],
         stars=json[YelpJsonFields.STARS.value],
         useful=json[YelpJsonFields.USEFUL.value],
         text=json[YelpJsonFields.TEXT.value],
-        date=to_date(review_date_str)
+        date_id=date.date_id
     )
+    return ReviewRecord(review, date)
 
 @dataclass(frozen=True)
 class BusinessRecord:
     address: Address
     attributes: list[Attribute] | None
     categories: list[Category] | None
+
         
